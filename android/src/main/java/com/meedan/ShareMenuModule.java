@@ -89,7 +89,6 @@ public class ShareMenuModule extends ReactContextBaseJavaModule implements Activ
     Activity currentActivity = getCurrentActivity();
 
     if (currentActivity == null) {
-      successCallback.invoke(null);
       return;
     }
 
