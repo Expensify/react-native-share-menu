@@ -58,18 +58,28 @@ class ShareViewController: SLComposeServiceViewController {
       return
     }
 
-    if let data = extraData {
-      storeExtraData(data)
-    } else {
-      removeExtraData()
-    }
-
-    if provider.isText {
-      storeText(withProvider: provider)
-    } else if provider.isURL {
-      storeUrl(withProvider: provider)
-    } else {
-      storeFile(withProvider: provider)
+      if let data = extraData {
+          storeExtraData(data)
+      } else {
+          removeExtraData()
+      }
+      
+      if let message =
+            self.textView.text {
+          var extra : [String:Any] = [String:Any]()
+          extra["message"] = message
+          storeExtraData(extra)
+      }
+      else {
+          removeExtraData()
+      }
+      
+      if provider.isText {
+          storeText(withProvider: provider)
+      } else if provider.isURL {
+          storeUrl(withProvider: provider)
+      } else {
+          storeFile(withProvider: provider)
     }
   }
 
