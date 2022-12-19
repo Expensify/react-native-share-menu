@@ -4,5 +4,6 @@
 @interface RCT_EXTERN_MODULE(ShareMenu, RCTEventEmitter)
 
 RCT_EXTERN_METHOD(getSharedText:(RCTResponseSenderBlock)callback)
+RCT_EXTERN_METHOD(clearSharedText)
 
 @end
