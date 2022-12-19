@@ -121,7 +121,7 @@ public class ShareMenuModule extends ReactContextBaseJavaModule implements Activ
             .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
             .emit(NEW_SHARE_EVENT, shared);
   }
-
+  @ReactMethod
   public void clearSharedText() {
     Activity mActivity = getCurrentActivity();
     

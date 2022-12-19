@@ -28,6 +28,9 @@ export default {
   getSharedText(callback) {
     this.getInitialShare(callback);
   },
+  clearSharedText() {
+    ShareMenu.clearSharedText();
+  },
   getInitialShare(callback) {
     ShareMenu.getSharedText(callback);
   },
