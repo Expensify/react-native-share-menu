@@ -45,6 +45,7 @@ public class ShareMenuReactView: NSObject {
         }
 
         extensionContext.completeRequest(returningItems: [], completionHandler: nil)
+        ShareMenuReactView.detachViewDelegate()
     }
 
     @objc
@@ -55,6 +56,7 @@ public class ShareMenuReactView: NSObject {
         }
 
         viewDelegate.openApp()
+        ShareMenuReactView.detachViewDelegate()
     }
 
     @objc(continueInApp:)
@@ -72,6 +74,7 @@ public class ShareMenuReactView: NSObject {
         }
 
         viewDelegate.continueInApp(with: items, and: extraData)
+        ShareMenuReactView.detachViewDelegate()
     }
 
     @objc(data:reject:)
