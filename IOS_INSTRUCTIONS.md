@@ -55,7 +55,10 @@ target '<PROJECT_NAME>' do
 end
 
 +target '<SHARE_EXTENSION_NAME>' do
-+  use_react_native!
++  use_react_native!(
++    :hermes_enabled => false
++    # :hermes_enabled => true # make sure to match the hermes setting for your app
++  )
 +
 +  pod 'RNShareMenu', :path => '../node_modules/react-native-share-menu'
 +  # Manually link packages here to keep your extension bundle size minimal
