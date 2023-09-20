@@ -6,7 +6,7 @@
 //
 
 #import "ShareMenuManager.h"
-#import "RNShareMenu-Swift.h"
+#import <RNShareMenu/RNShareMenu-Swift.h>
 
 #import <React/RCTLinkingManager.h>
 
