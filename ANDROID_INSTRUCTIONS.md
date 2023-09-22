@@ -58,5 +58,10 @@ public class MainApplication extends Application implements ReactApplication {
     <data android:mimeType="image/*" />
     <!-- Any other mime types you want to support -->
   </intent-filter>
+  <intent-filter>
+      <action android:name="android.intent.action.VIEW" />
+      <category android:name="android.intent.category.DEFAULT" />
+      <data android:mimeType="*/*" />
+  </intent-filter>
 </activity>
 ```

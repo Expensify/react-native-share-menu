@@ -58,7 +58,20 @@ public class ShareMenuModule extends ReactContextBaseJavaModule implements Activ
     WritableMap data = Arguments.createMap();
     data.putString(MIME_TYPE_KEY, type);
 
-    if (Intent.ACTION_SEND.equals(action)) {
+    if (Intent.ACTION_VIEW.equals(action)) {
+
+      if ("text/plain".equals(type)) {
+        data.putString(DATA_KEY, intent.getStringExtra(Intent.EXTRA_TEXT));
+        return data;
+      }
+
+      Uri fileUri = intent.getData();
+
+      if (fileUri != null) {
+        data.putString(DATA_KEY, fileUri.toString());
+        return data;
+      }
+    } else if (Intent.ACTION_SEND.equals(action)) {
       if ("text/plain".equals(type)) {
         data.putString(DATA_KEY, intent.getStringExtra(Intent.EXTRA_TEXT));
         return data;
