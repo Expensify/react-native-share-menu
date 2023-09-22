@@ -126,7 +126,7 @@ public class ShareMenuReactView: NSObject {
                         semaphore.wait()
                     } else if provider.hasItemConformingToTypeIdentifier(kUTTypeImage as String) {
                         provider.loadItem(forTypeIdentifier: kUTTypeImage as String, options: nil) { (item, error) in
-                            let imageUrl: URL! = item as? URL
+                            var imageUrl: URL! = item as? URL
 
                             if (imageUrl != nil) {
                                 if let imageData = try? Data(contentsOf: imageUrl) {
@@ -139,15 +139,19 @@ public class ShareMenuReactView: NSObject {
                                     let imageData: Data! = image.pngData();
 
                                     // Creating temporary URL for image data (UIImage)
-                                    guard let imageURL = NSURL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent("TemporaryScreenshot.png") else {
+                                    let tmpDir = NSTemporaryDirectory()
+                                    let tmpFilename = NSUUID().uuidString + ".jpg"
+                                    imageUrl = NSURL.fileURL(withPathComponents: [tmpDir, tmpFilename])
+
+                                    if imageUrl == nil {
                                         return
                                     }
 
                                     do {
                                         // Writing the image to the URL
-                                        try imageData.write(to: imageURL)
+                                        try imageData.write(to: imageUrl)
 
-                                        results.append([DATA_KEY: imageUrl.absoluteString, MIME_TYPE_KEY: imageURL.extractMimeType()])
+                                        results.append([DATA_KEY: imageUrl.absoluteString, MIME_TYPE_KEY: imageUrl.extractMimeType()])
                                     } catch {
                                         callback(nil, NSException(name: NSExceptionName(rawValue: "Error"), reason:"Can't load image", userInfo:nil))
                                     }
