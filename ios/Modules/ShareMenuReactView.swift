@@ -18,7 +18,7 @@ public class ShareMenuReactView: NSObject {
     }
 
     public static func attachViewDelegate(_ delegate: ReactShareViewDelegate!) {
-        guard (ShareMenuReactView.viewDelegate == nil) else { return }
+//        guard (ShareMenuReactView.viewDelegate == nil) else { return }
 
         ShareMenuReactView.viewDelegate = delegate
     }
