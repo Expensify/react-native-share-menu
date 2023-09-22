@@ -6,7 +6,7 @@
 //
 //  Created by Gustavo Parreira on 26/07/2020.
 //
-//  Modified by Veselin Stoyanov on 17/04/2021.
+//  Modified by Damien White on 18/06/2022.
 
 import Foundation
 import MobileCoreServices
@@ -47,7 +47,12 @@ class ShareViewController: SLComposeServiceViewController {
         return
       }
 
-      handlePost(items)
+      if (contentText != nil && contentText != "") {
+        let extraData: [String: Any] = ["userInput": contentText as String]
+        handlePost(items, extraData: extraData)
+      } else {
+        handlePost(items)
+      }
     }
 
     override func configurationItems() -> [Any]! {
