@@ -47,13 +47,13 @@ Open your Share Extension's `Info.plist` and add the following:
 <key>ReactShareViewBackgroundColor</key>
 <dict>
     <key>Red</key>
-    <integer>1</integer>
+    <real>1</real>
     <key>Green</key>
-    <integer>1</integer>
+    <real>1</real>
     <key>Blue</key>
-    <integer>1</integer>
+    <real>1</real>
     <key>Alpha</key>
-    <integer>1</integer>
+    <real>1</real>
     <key>Transparent</key>
     <false/>
 </dict>
