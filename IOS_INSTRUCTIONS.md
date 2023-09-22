@@ -82,7 +82,7 @@ Create an App Group to be able to share data between your extension and your app
 
 ![Add App Groups](screenshots/Xcode-05.png)
 
-At the bottom of the window on Xcode you should see an `App Groups` section. Press the `+` button and add a group named `group.YOUR_APP_BUNDLE_ID`.
+At the bottom of the window on Xcode you should see an `App Groups` section. Press the `+` button and add a group named `group.AN_APP_BUNDLE_ID`.
 
 Repeat this process for the Share Extension target, with the exact same group name.
 
@@ -101,13 +101,17 @@ Add the following to your app's `Info.plist` (if you already had other URL Schem
         </array>
     </dict>
 </array>
+<key>HostAppBundleIdentifier</key>
+<string>YOUR_APP_GROUP_IDENTIFIER_WITHOUT_GROUP_AND_POINT</string>
+<!-- This is the app group identifier without "group." - E.G. for app group "group.com.myapp" : "com.myapp" -->
 ```
 
 Add the following to your Share Extension's `Info.plist`:
 
 ```OpenStep Property List
 <key>HostAppBundleIdentifier</key>
-<string>YOUR_APP_TARGET_BUNDLE_ID</string>
+<string>YOUR_APP_GROUP_IDENTIFIER_WITHOUT_GROUP_AND_POINT</string>
+<!-- This is the app group identifier without "group." - E.G. for app group "group.com.myapp" : "com.myapp" -->
 <key>HostAppURLScheme</key>
 <string>YOUR_APP_URL_SCHEME_DEFINED_ABOVE</string>
 <!-- This url scheme CONTAINS :// at the end - E.G. "mycustomscheme://"-->

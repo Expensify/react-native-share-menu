@@ -83,7 +83,7 @@ class ShareMenu: RCTEventEmitter {
         }
 
         guard let scheme = url.scheme, scheme == targetUrlScheme else { return }
-        guard let bundleId = Bundle.main.bundleIdentifier else { return }
+        guard let bundleId = Bundle.main.object(forInfoDictionaryKey: HOST_APP_IDENTIFIER_INFO_PLIST_KEY) else { return }
         guard let userDefaults = UserDefaults(suiteName: "group.\(bundleId)") else {
             print("Error: \(NO_APP_GROUP_ERROR)")
             return
@@ -102,7 +102,7 @@ class ShareMenu: RCTEventEmitter {
     func getSharedText(callback: RCTResponseSenderBlock) {
         var data = [DATA_KEY: sharedData] as [String: Any]
 
-        if let bundleId = Bundle.main.bundleIdentifier, let userDefaults = UserDefaults(suiteName: "group.\(bundleId)") {
+        if let bundleId = Bundle.main.object(forInfoDictionaryKey: HOST_APP_IDENTIFIER_INFO_PLIST_KEY), let userDefaults = UserDefaults(suiteName: "group.\(bundleId)") {
             data[EXTRA_DATA_KEY] = userDefaults.object(forKey: USER_DEFAULTS_EXTRA_DATA_KEY) as? [String: Any]
         } else {
             print("Error: \(NO_APP_GROUP_ERROR)")
