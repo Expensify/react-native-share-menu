@@ -17,7 +17,7 @@ project(':react-native-share-menu').projectDir = new File(rootProject.projectDir
 ...
 dependencies {
     ...
-    compile project(':react-native-share-menu')
+    implementation project(':react-native-share-menu')
 }
 ```
 
