@@ -27,6 +27,11 @@ public class ShareMenuReactView: NSObject {
         ShareMenuReactView.viewDelegate = nil
     }
 
+    @objc
+    func constantsToExport() -> [String: Any]! {
+        return ["isExtension": ShareMenuReactView.viewDelegate?.loadExtensionContext() != nil]
+    }
+
     @objc(dismissExtension:)
     func dismissExtension(_ error: String?) {
         guard let extensionContext = ShareMenuReactView.viewDelegate?.loadExtensionContext() else {

@@ -1,4 +1,4 @@
-import { NativeModules, NativeEventEmitter } from "react-native";
+import { NativeEventEmitter, NativeModules } from "react-native";
 
 const { ShareMenu } = NativeModules;
 
@@ -7,17 +7,21 @@ const EventEmitter = new NativeEventEmitter(ShareMenu);
 const NEW_SHARE_EVENT_NAME = "NewShareEvent";
 
 export const ShareMenuReactView = {
-  dismissExtension(error = null) {
-    NativeModules.ShareMenuReactView.dismissExtension(error);
-  },
-  openApp() {
-    NativeModules.ShareMenuReactView.openApp();
-  },
   continueInApp(extraData = null) {
     NativeModules.ShareMenuReactView.continueInApp(extraData);
   },
   data() {
     return NativeModules.ShareMenuReactView.data();
+  },
+  dismissExtension(error = null) {
+    NativeModules.ShareMenuReactView.dismissExtension(error);
+  },
+  isExtension: !!(
+    NativeModules.ShareMenuReactView &&
+    NativeModules.ShareMenuReactView.isExtension
+  ),
+  openApp() {
+    NativeModules.ShareMenuReactView.openApp();
   },
 };
 
