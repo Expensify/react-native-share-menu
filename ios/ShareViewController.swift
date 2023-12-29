@@ -21,7 +21,6 @@ enum ShareViewControllerError: Error {
 }
 
 class ShareViewController: SLComposeServiceViewController {
-  var hostAppId: String?
   var sharedItems: [[String: String]] = []
   
   internal func getStringFromPlist(key: String) throws -> String {
@@ -67,16 +66,6 @@ class ShareViewController: SLComposeServiceViewController {
     return groupFileManagerContainer
   }
   
-  override func viewDidLoad() {
-    super.viewDidLoad()
-    
-    if let hostAppId = Bundle.main.object(forInfoDictionaryKey: HOST_APP_IDENTIFIER_INFO_PLIST_KEY) as? String {
-      self.hostAppId = hostAppId
-    } else {
-      print("Error: \(NO_INFO_PLIST_INDENTIFIER_ERROR)")
-    }
-  }
-
     override func isContentValid() -> Bool {
         // Do validation of contentText and/or NSExtensionContext attachments here
         return true
