@@ -14,10 +14,58 @@ import UIKit
 import Social
 import RNShareMenu
 
+enum ShareViewControllerError: Error {
+  case missingKey(key: String)
+  case unknownGroup(name: String)
+  case fileAccessError(debugDescription: String)
+}
+
 class ShareViewController: SLComposeServiceViewController {
   var hostAppId: String?
-  var hostAppUrlScheme: String?
-  var sharedItems: [Any] = []
+  var sharedItems: [[String: String]] = []
+  
+  internal func getStringFromPlist(key: String) throws -> String {
+    guard let entry = Bundle.main.object(forInfoDictionaryKey: key) as? String else {
+      if #available(iOSApplicationExtension 14.0, *) {
+        Logger().error("Error: You haven't defined '\(key)' in your Share Extension's Info.plist")
+      }
+      throw ShareViewControllerError.missingKey(key: key)
+    }
+
+    return entry
+  }
+  
+  func getAppGroupName() throws -> String {
+    do {
+      return try getStringFromPlist(key: APP_GROUP_KEY)
+    }
+    catch {
+      return try "group." + getStringFromPlist(key: HOST_APP_IDENTIFIER_INFO_PLIST_KEY)
+    }
+  }
+  
+  func getUrlScheme() throws -> String {
+    return try getStringFromPlist(key: HOST_URL_SCHEME_INFO_PLIST_KEY)
+  }
+  
+  func getUserDefaultsInstance() throws -> UserDefaults {
+    let appGroup = try getAppGroupName()
+    guard let userDefaults = UserDefaults(suiteName: appGroup) else {
+      throw ShareViewControllerError.unknownGroup(name: appGroup)
+    }
+
+    return userDefaults
+  }
+  
+  func getGroupFileManagerContainer() throws -> URL {
+    let appGroup = try getAppGroupName()
+    guard let groupFileManagerContainer = FileManager.default
+            .containerURL(forSecurityApplicationGroupIdentifier: appGroup)
+    else {
+      throw ShareViewControllerError.unknownGroup(name: appGroup)
+    }
+    return groupFileManagerContainer
+  }
   
   override func viewDidLoad() {
     super.viewDidLoad()
@@ -26,12 +74,6 @@ class ShareViewController: SLComposeServiceViewController {
       self.hostAppId = hostAppId
     } else {
       print("Error: \(NO_INFO_PLIST_INDENTIFIER_ERROR)")
-    }
-    
-    if let hostAppUrlScheme = Bundle.main.object(forInfoDictionaryKey: HOST_URL_SCHEME_INFO_PLIST_KEY) as? String {
-      self.hostAppUrlScheme = hostAppUrlScheme
-    } else {
-      print("Error: \(NO_INFO_PLIST_URL_SCHEME_ERROR)")
     }
   }
 
@@ -57,73 +99,56 @@ class ShareViewController: SLComposeServiceViewController {
 
   func handlePost(_ items: [NSExtensionItem], extraData: [String:Any]? = nil) {
     DispatchQueue.global().async {
-      guard let hostAppId = self.hostAppId else {
-        self.exit(withError: NO_INFO_PLIST_INDENTIFIER_ERROR)
-        return
-      }
-      guard let userDefaults = UserDefaults(suiteName: "group.\(hostAppId)") else {
-        self.exit(withError: NO_APP_GROUP_ERROR)
-        return
-      }
-
-      if let data = extraData {
-        self.storeExtraData(data)
-      } else {
-        self.removeExtraData()
-      }
-
-      let semaphore = DispatchSemaphore(value: 0)
-      var results: [Any] = []
-
-      for item in items {
-        guard let attachments = item.attachments else {
-          self.cancelRequest()
-          return
+      do {
+        let userDefaults = try self.getUserDefaultsInstance()
+        
+        if let data = extraData {
+          try self.storeExtraData(data)
+        } else {
+          try self.removeExtraData()
         }
-
-        for provider in attachments {
-          if provider.isText {
-            self.storeText(withProvider: provider, semaphore)
-          } else if provider.isURL {
-            self.storeUrl(withProvider: provider, semaphore)
-          } else {
-            self.storeFile(withProvider: provider, semaphore)
+        
+        let semaphore = DispatchSemaphore(value: 0)
+        
+        for item in items {
+          guard let attachments = item.attachments else {
+            self.cancelRequest()
+            return
           }
-
-          semaphore.wait()
+          
+          for provider in attachments {
+            if provider.isText {
+              self.storeText(withProvider: provider, semaphore)
+            } else if provider.isURL {
+              self.storeUrl(withProvider: provider, semaphore)
+            } else {
+              self.storeFile(withProvider: provider, semaphore)
+            }
+            
+            semaphore.wait()
+          }
+          
         }
+
+        userDefaults.set(self.sharedItems, forKey: USER_DEFAULTS_KEY)
+        userDefaults.synchronize()
+
+        try self.openHostApp()
       }
-
-      userDefaults.set(self.sharedItems,
-                       forKey: USER_DEFAULTS_KEY)
-      userDefaults.synchronize()
-
-      self.openHostApp()
+      catch {
+        self.extensionContext!.cancelRequest(withError: error)
+      }
     }
   }
 
-  func storeExtraData(_ data: [String:Any]) {
-    guard let hostAppId = self.hostAppId else {
-      print("Error: \(NO_INFO_PLIST_INDENTIFIER_ERROR)")
-      return
-    }
-    guard let userDefaults = UserDefaults(suiteName: "group.\(hostAppId)") else {
-      print("Error: \(NO_APP_GROUP_ERROR)")
-      return
-    }
+  func storeExtraData(_ data: [String:Any]) throws {
+    let userDefaults = try self.getUserDefaultsInstance()
     userDefaults.set(data, forKey: USER_DEFAULTS_EXTRA_DATA_KEY)
     userDefaults.synchronize()
   }
 
-  func removeExtraData() {
-    guard let hostAppId = self.hostAppId else {
-      print("Error: \(NO_INFO_PLIST_INDENTIFIER_ERROR)")
-      return
-    }
-    guard let userDefaults = UserDefaults(suiteName: "group.\(hostAppId)") else {
-      print("Error: \(NO_APP_GROUP_ERROR)")
-      return
-    }
+  func removeExtraData() throws {
+    let userDefaults = try self.getUserDefaultsInstance()
     userDefaults.removeObject(forKey: USER_DEFAULTS_EXTRA_DATA_KEY)
     userDefaults.synchronize()
   }
@@ -162,53 +187,36 @@ class ShareViewController: SLComposeServiceViewController {
   
   func storeFile(withProvider provider: NSItemProvider, _ semaphore: DispatchSemaphore) {
     provider.loadItem(forTypeIdentifier: kUTTypeData as String, options: nil) { (data, error) in
-      guard (error == nil) else {
-        self.exit(withError: error.debugDescription)
-        return
+      do {
+        guard (error == nil) else {
+          throw ShareViewControllerError.fileAccessError(debugDescription: error.debugDescription)
+        }
+        guard let url = data as? URL else {
+          throw ShareViewControllerError.fileAccessError(debugDescription: COULD_NOT_FIND_IMG_ERROR)
+        }
+
+        let groupFileManagerContainer = try self.getGroupFileManagerContainer()
+        let mimeType = url.extractMimeType()
+        let fileExtension = url.pathExtension
+        let fileName = UUID().uuidString
+        let filePath = groupFileManagerContainer
+          .appendingPathComponent("\(fileName).\(fileExtension)")
+        
+        try self.moveFileToDisk(from: url, to: filePath)
+        self.sharedItems.append([DATA_KEY: filePath.absoluteString, MIME_TYPE_KEY: mimeType])
+        semaphore.signal()
       }
-      guard let url = data as? URL else {
-        self.exit(withError: COULD_NOT_FIND_IMG_ERROR)
-        return
+      catch {
+        self.extensionContext!.cancelRequest(withError: error)
       }
-      guard let hostAppId = self.hostAppId else {
-        self.exit(withError: NO_INFO_PLIST_INDENTIFIER_ERROR)
-        return
-      }
-      guard let groupFileManagerContainer = FileManager.default
-              .containerURL(forSecurityApplicationGroupIdentifier: "group.\(hostAppId)")
-      else {
-        self.exit(withError: NO_APP_GROUP_ERROR)
-        return
-      }
-      
-      let mimeType = url.extractMimeType()
-      let fileExtension = url.pathExtension
-      let fileName = UUID().uuidString
-      let filePath = groupFileManagerContainer
-        .appendingPathComponent("\(fileName).\(fileExtension)")
-      
-      guard self.moveFileToDisk(from: url, to: filePath) else {
-        self.exit(withError: COULD_NOT_SAVE_FILE_ERROR)
-        return
-      }
-      
-      self.sharedItems.append([DATA_KEY: filePath.absoluteString, MIME_TYPE_KEY: mimeType])
-      semaphore.signal()
     }
   }
 
-  func moveFileToDisk(from srcUrl: URL, to destUrl: URL) -> Bool {
-    do {
-      if FileManager.default.fileExists(atPath: destUrl.path) {
-        try FileManager.default.removeItem(at: destUrl)
-      }
-      try FileManager.default.copyItem(at: srcUrl, to: destUrl)
-    } catch (let error) {
-      print("Could not save file from \(srcUrl) to \(destUrl): \(error)")
-      return false
+  func moveFileToDisk(from srcUrl: URL, to destUrl: URL) throws {
+    if FileManager.default.fileExists(atPath: destUrl.path) {
+      try FileManager.default.removeItem(at: destUrl)
     }
-    
-    return true
+    try FileManager.default.copyItem(at: srcUrl, to: destUrl)
   }
   
   func exit(withError error: String) {
@@ -216,13 +224,17 @@ class ShareViewController: SLComposeServiceViewController {
     cancelRequest()
   }
   
-  internal func openHostApp() {
-    guard let urlScheme = self.hostAppUrlScheme else {
-      exit(withError: NO_INFO_PLIST_URL_SCHEME_ERROR)
-      return
+  internal func getHostAppUrl() throws -> URL? {
+    let urlScheme = try self.getUrlScheme()
+    if !urlScheme.hasSuffix("://") {
+      return URL(string: urlScheme + "://")
     }
     
-    let url = URL(string: urlScheme)
+    return URL(string: urlScheme)
+  }
+  
+  internal func openHostApp() throws {
+    let url = try getHostAppUrl()
     let selectorOpenURL = sel_registerName("openURL:")
     var responder: UIResponder? = self
     
