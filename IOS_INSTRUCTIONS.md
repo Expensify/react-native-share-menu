@@ -117,7 +117,7 @@ Add the following to your Share Extension's `Info.plist`:
 <string>YOUR_APP_TARGET_BUNDLE_ID</string>
 <key>HostAppURLScheme</key>
 <string>YOUR_APP_URL_SCHEME_DEFINED_ABOVE</string>
-<!-- This url scheme CONTAINS :// at the end - E.G. "mycustomscheme://"-->
+<!-- This value can contain a scheme with or without :// at the end. e.g.: "myscheme" or "myscheme://" both work fine -->
 <key>NSExtension</key>
 <dict>
     <key>NSExtensionAttributes</key>
