@@ -89,6 +89,8 @@ Repeat this process for the Share Extension target, with the exact same group na
 Add the following to your app's `Info.plist` (if you already had other URL Schemes, make sure the one you're adding now is the FIRST one):
 
 ```OpenStep Property List
+<key>AppGroup</key>
+<string>THE_APP_GROUP_CREATED_ABOVE</string>
 <key>CFBundleURLTypes</key>
 <array>
     <dict>
@@ -106,11 +108,16 @@ Add the following to your app's `Info.plist` (if you already had other URL Schem
 Add the following to your Share Extension's `Info.plist`:
 
 ```OpenStep Property List
+<key>AppGroup</key>
+<string>THE_APP_GROUP_CREATED_ABOVE</string>
+<!-- DEPRECATED: HostAppBundleIdentifier is only used for backwards compatibility -->
+<!-- This property only exists because the plugin previously assumed that your group name would match your bundle name.
+<!-- To migrate rename 'HostAppBundleIdentifier' to 'AppGroup' and prefix it's value with 'group.'
 <key>HostAppBundleIdentifier</key>
 <string>YOUR_APP_TARGET_BUNDLE_ID</string>
 <key>HostAppURLScheme</key>
 <string>YOUR_APP_URL_SCHEME_DEFINED_ABOVE</string>
-<!-- This url scheme CONTAINS :// at the end - E.G. "mycustomscheme://"-->
+<!-- This value can contain a scheme with or without :// at the end. e.g.: "myscheme" or "myscheme://" both work fine -->
 <key>NSExtension</key>
 <dict>
     <key>NSExtensionAttributes</key>
