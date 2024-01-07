@@ -1,7 +1,6 @@
 # Android Installation
 
-##
-<summary>Manual Install</summary>
+## Manual Install
 
 - In `android/settings.gradle`
 
