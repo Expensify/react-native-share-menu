@@ -1,6 +1,6 @@
 # Android Installation
 
-## 1. Manual Install
+## Step 1. Manual Install
 
 - In `android/settings.gradle`
 
@@ -40,7 +40,7 @@ public class MainApplication extends Application implements ReactApplication {
 ```
 
 
-## 2. Add Intent Filter
+## Step 2. Add Intent Filter
 
 - In `android/app/src/main/AndroidManifest.xml` in the `<activity>` tag:
 
