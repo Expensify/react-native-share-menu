@@ -1,6 +1,6 @@
 # Android Installation
 
-<details>
+##
 <summary>Manual Install</summary>
 
 - In `android/settings.gradle`
@@ -40,7 +40,6 @@ public class MainApplication extends Application implements ReactApplication {
 }
 ```
 
-</details>
 
 ## Add Intent Filter
 
