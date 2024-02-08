@@ -7,7 +7,7 @@
 		<dict/>
 	</array>
 	<key>UserDefaults</key>
-	<string>CA92.1</string>
+	<string>CA92.1 : Acces info from same app, per documentation</string>
 	<key>NSPrivacyCollectedDataTypes</key>
 	<array>
 		<dict/>
