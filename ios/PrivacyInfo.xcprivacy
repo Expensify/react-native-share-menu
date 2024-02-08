@@ -6,6 +6,8 @@
 	<array>
 		<dict/>
 	</array>
+	<key>UserDefaults</key>
+	<string>CA92.1</string>
 	<key>NSPrivacyCollectedDataTypes</key>
 	<array>
 		<dict/>
