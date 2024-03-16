@@ -55,7 +55,7 @@ target '<PROJECT_NAME>' do
 end
 
 +target '<SHARE_EXTENSION_NAME>' do
-+  use_react_native!
++  use_react_native!(:flipper_configuration => flipper_config)
 +
 +  pod 'RNShareMenu', :path => '../node_modules/react-native-share-menu'
 +  # Manually link packages here to keep your extension bundle size minimal
