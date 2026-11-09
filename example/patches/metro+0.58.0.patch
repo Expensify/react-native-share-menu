@@ -1,0 +1,54 @@
+diff --git a/node_modules/metro/src/Assets.js b/node_modules/metro/src/Assets.js
+index d052449..82fba95 100644
+--- a/node_modules/metro/src/Assets.js
++++ b/node_modules/metro/src/Assets.js
+@@ -87,7 +87,7 @@ const denodeify = require("denodeify");
+ 
+ const fs = require("fs");
+ 
+-const imageSize = require("image-size");
++const imageSize = require("image-size").imageSize;
+ 
+ const path = require("path");
+ 
+@@ -258,10 +258,9 @@ function _getAssetData() {
+ 
+     const isImage = isAssetTypeAnImage(path.extname(assetPath).slice(1));
+     const assetInfo = yield getAbsoluteAssetInfo(assetPath, platform);
+-    const isImageInput = assetInfo.files[0].includes(".zip/")
+-      ? fs.readFileSync(assetInfo.files[0])
+-      : assetInfo.files[0];
+-    const dimensions = isImage ? imageSize(isImageInput) : null;
++    const dimensions = isImage
++      ? imageSize(fs.readFileSync(assetInfo.files[0]))
++      : null;
+     const scale = assetInfo.scales[0];
+     const assetData = {
+       __packager_asset: true,
+diff --git a/node_modules/metro/src/Assets.js.flow b/node_modules/metro/src/Assets.js.flow
+index 8e6b8ff..25bd85b 100644
+--- a/node_modules/metro/src/Assets.js.flow
++++ b/node_modules/metro/src/Assets.js.flow
+@@ -15,7 +15,7 @@ const AssetPaths = require('./node-haste/lib/AssetPaths');
+ const crypto = require('crypto');
+ const denodeify = require('denodeify');
+ const fs = require('fs');
+-const imageSize = require('image-size');
++const imageSize = require('image-size').imageSize;
+ const path = require('path');
+ 
+ const {isAssetTypeAnImage} = require('./Bundler/util');
+@@ -206,10 +206,9 @@ async function getAssetData(
+   const isImage = isAssetTypeAnImage(path.extname(assetPath).slice(1));
+   const assetInfo = await getAbsoluteAssetInfo(assetPath, platform);
+ 
+-  const isImageInput = assetInfo.files[0].includes('.zip/')
+-    ? fs.readFileSync(assetInfo.files[0])
+-    : assetInfo.files[0];
+-  const dimensions = isImage ? imageSize(isImageInput) : null;
++  const dimensions = isImage
++    ? imageSize(fs.readFileSync(assetInfo.files[0]))
++    : null;
+   const scale = assetInfo.scales[0];
+ 
+   const assetData = {

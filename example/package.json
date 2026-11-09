@@ -7,7 +7,9 @@
     "ios": "react-native run-ios",
     "start": "react-native start",
     "test": "jest",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "postinstall": "patch-package --error-on-fail",
+    "test:assets": "node --test tests/metro-assets.test.cjs"
   },
   "dependencies": {
     "react": "16.13.1",
@@ -22,7 +24,14 @@
     "eslint": "^6.5.1",
     "jest": "^25.1.0",
     "metro-react-native-babel-preset": "^0.59.0",
+    "patch-package": "8.0.1",
     "react-test-renderer": "16.13.1"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "resolutions": {
+    "image-size": "2.0.3"
   },
   "jest": {
     "preset": "react-native"
