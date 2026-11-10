@@ -26,5 +26,8 @@
   },
   "jest": {
     "preset": "react-native"
+  },
+  "resolutions": {
+    "shell-quote": "^1.9.0"
   }
 }
