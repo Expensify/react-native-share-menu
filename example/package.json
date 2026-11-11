@@ -28,6 +28,7 @@
     "preset": "react-native"
   },
   "resolutions": {
+    "node-fetch": "2.7.0",
     "shell-quote": "^1.9.0"
   }
 }
