@@ -1,7 +1,7 @@
-#import <React/RCTBridgeDelegate.h>
+#import <React_RCTAppDelegate/RCTDefaultReactNativeFactoryDelegate.h>
 #import <UIKit/UIKit.h>
 
-@interface AppDelegate : UIResponder <UIApplicationDelegate, RCTBridgeDelegate>
+@interface AppDelegate : RCTDefaultReactNativeFactoryDelegate <UIApplicationDelegate>
 
 @property (nonatomic, strong) UIWindow *window;
 

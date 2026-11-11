@@ -24,42 +24,6 @@
 	<string>com.github.meedaan.ReactNativeShareMenuExample</string>
 	<key>HostAppURLScheme</key>
 	<string>ShareMenuModule://</string>
-	<key>NSExtension</key>
-	<dict>
-		<key>NSExtensionAttributes</key>
-		<dict>
-			<key>NSExtensionActivationRule</key>
-			<dict>
-				<key>NSExtensionActivationSupportsFileWithMaxCount</key>
-				<integer>1</integer>
-				<key>NSExtensionActivationSupportsMovieWithMaxCount</key>
-				<integer>1</integer>
-				<key>NSExtensionActivationSupportsImageWithMaxCount</key>
-				<integer>1</integer>
-				<key>NSExtensionActivationSupportsText</key>
-				<true/>
-				<key>NSExtensionActivationSupportsWebURLWithMaxCount</key>
-				<integer>1</integer>
-			</dict>
-		</dict>
-		<key>NSExtensionMainStoryboard</key>
-		<string>MainInterface</string>
-		<key>NSExtensionPointIdentifier</key>
-		<string>com.apple.share-services</string>
-	</dict>
-	<key>ReactShareViewBackgroundColor</key>
-	<dict>
-		<key>Red</key>
-		<integer>1</integer>
-		<key>Green</key>
-		<integer>1</integer>
-		<key>Blue</key>
-		<integer>1</integer>
-		<key>Alpha</key>
-		<integer>1</integer>
-		<key>Transparent</key>
-		<false/>
-	</dict>
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSAllowsArbitraryLoads</key>
@@ -72,6 +36,44 @@
 				<true/>
 			</dict>
 		</dict>
+	</dict>
+	<key>NSExtension</key>
+	<dict>
+		<key>NSExtensionAttributes</key>
+		<dict>
+			<key>NSExtensionActivationRule</key>
+			<dict>
+				<key>NSExtensionActivationSupportsFileWithMaxCount</key>
+				<integer>1</integer>
+				<key>NSExtensionActivationSupportsImageWithMaxCount</key>
+				<integer>1</integer>
+				<key>NSExtensionActivationSupportsMovieWithMaxCount</key>
+				<integer>1</integer>
+				<key>NSExtensionActivationSupportsText</key>
+				<true/>
+				<key>NSExtensionActivationSupportsWebURLWithMaxCount</key>
+				<integer>1</integer>
+			</dict>
+		</dict>
+		<key>NSExtensionMainStoryboard</key>
+		<string>MainInterface</string>
+		<key>NSExtensionPointIdentifier</key>
+		<string>com.apple.share-services</string>
+	</dict>
+	<key>RCTNewArchEnabled</key>
+	<true/>
+	<key>ReactShareViewBackgroundColor</key>
+	<dict>
+		<key>Alpha</key>
+		<integer>1</integer>
+		<key>Blue</key>
+		<integer>1</integer>
+		<key>Green</key>
+		<integer>1</integer>
+		<key>Red</key>
+		<integer>1</integer>
+		<key>Transparent</key>
+		<false/>
 	</dict>
 </dict>
 </plist>
