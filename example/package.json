@@ -31,13 +31,14 @@
     "prettier": "2.8.8",
     "react-test-renderer": "19.3.0"
   },
+  "resolutions": {
+    "form-data": "2.5.6",
+    "shell-quote": "^1.9.0"
+  },
   "jest": {
     "preset": "@react-native/jest-preset"
   },
   "engines": {
     "node": "^22.13.0 || ^24.3.0 || >=26.0.0"
-  },
-  "resolutions": {
-    "shell-quote": "^1.9.0"
   }
 }
