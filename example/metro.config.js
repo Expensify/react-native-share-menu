@@ -11,19 +11,20 @@
 // see also this discussion:
 // https://github.com/brodybits/create-react-native-module/issues/232
 
-const path = require('path')
+const path = require('path');
+const {getDefaultConfig, mergeConfig} = require('@react-native/metro-config');
 
-module.exports = {
+module.exports = mergeConfig(getDefaultConfig(__dirname), {
   // workaround for an issue with symlinks encountered starting with
   // metro@0.55 / React Native 0.61
   // (not needed with React Native 0.60 / metro@0.54)
   resolver: {
     extraNodeModules: new Proxy(
       {},
-      { get: (_, name) => path.resolve('.', 'node_modules', name) }
-    )
+      {get: (_, name) => path.resolve(__dirname, 'node_modules', name)},
+    ),
   },
 
   // quick workaround for another issue with symlinks
-  watchFolders: ['.', '..']
-}
+  watchFolders: [__dirname, path.resolve(__dirname, '..')],
+});
