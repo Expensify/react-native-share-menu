@@ -37,3 +37,24 @@ it('displays an initial text share and removes its listener', () => {
   renderer.act(() => tree.unmount());
   expect(remove).toHaveBeenCalled();
 });
+
+it('ignores an empty iOS share on startup', () => {
+  ShareMenu.getInitialShare.mockImplementationOnce(callback => callback({data: null}));
+
+  renderer.act(() => {
+    renderer.create(<App />);
+  });
+});
+
+it('displays an iOS share and its extra data', () => {
+  ShareMenu.getInitialShare.mockImplementationOnce(callback =>
+    callback({data: [{mimeType: 'text/plain', data: 'Shared from iOS'}], extraData: {hello: 'world'}}),
+  );
+
+  let tree;
+  renderer.act(() => {
+    tree = renderer.create(<App />);
+  });
+  expect(JSON.stringify(tree.toJSON())).toContain('Shared from iOS');
+  expect(JSON.stringify(tree.toJSON())).toContain('hello');
+});
