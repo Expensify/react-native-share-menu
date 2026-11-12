@@ -14,26 +14,36 @@ type SharedItem = {
   data: string,
 };
 
+type SharePayload = {
+  mimeType?: string,
+  data: string | null | Array<?SharedItem> | Array<string>,
+  extraData?: {[string]: mixed},
+};
+
 const App: () => React$Node = () => {
   const [sharedData, setSharedData] = useState('');
   const [sharedMimeType, setSharedMimeType] = useState('');
   const [sharedExtraData, setSharedExtraData] = useState(null);
 
-  const handleShare = useCallback((item: ?SharedItem) => {
+  const handleShare = useCallback((item: ?SharePayload) => {
     if (!item) {
       return;
     }
 
-    const {mimeType, data, extraData} = item;
+    const sharedItem = Array.isArray(item.data) && typeof item.mimeType !== 'string' ? item.data[0] : item;
+    if (!sharedItem || typeof sharedItem.mimeType !== 'string') {
+      return;
+    }
+    const {mimeType, data} = sharedItem;
 
     setSharedData(data);
-    setSharedExtraData(extraData);
+    setSharedExtraData(item.extraData);
     setSharedMimeType(mimeType);
   }, []);
 
   useEffect(() => {
     ShareMenu.getInitialShare(handleShare);
-  }, []);
+  }, [handleShare]);
 
   useEffect(() => {
     const listener = ShareMenu.addNewShareListener(handleShare);
@@ -41,7 +51,7 @@ const App: () => React$Node = () => {
     return () => {
       listener.remove();
     };
-  }, []);
+  }, [handleShare]);
 
   return (
     <View style={styles.container}>

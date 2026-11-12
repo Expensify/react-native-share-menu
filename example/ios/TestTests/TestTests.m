@@ -5,7 +5,7 @@
 #import <React/RCTRootView.h>
 
 #define TIMEOUT_SECONDS 600
-#define TEXT_TO_LOOK_FOR @"Welcome to React"
+#define TEXT_TO_LOOK_FOR @"React Native Share Menu"
 
 @interface TestTests : XCTestCase
 
@@ -28,7 +28,19 @@
 
 - (void)testRendersWelcomeScreen
 {
-  UIViewController *vc = [[[RCTSharedApplication() delegate] window] rootViewController];
+  UIViewController *vc = nil;
+  for (UIScene *scene in RCTSharedApplication().connectedScenes) {
+    if ([scene isKindOfClass:[UIWindowScene class]]) {
+      vc = ((UIWindowScene *)scene).windows.firstObject.rootViewController;
+      if (vc) {
+        break;
+      }
+    }
+  }
+  XCTAssertNotNil(vc);
+  if (!vc) {
+    return;
+  }
   NSDate *date = [NSDate dateWithTimeIntervalSinceNow:TIMEOUT_SECONDS];
   BOOL foundElement = NO;
 

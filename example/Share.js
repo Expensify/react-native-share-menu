@@ -14,7 +14,12 @@ const Share = () => {
   const [sending, setSending] = useState(false);
 
   useEffect(() => {
-    ShareMenuReactView.data().then(({mimeType, data}) => {
+    ShareMenuReactView.data().then(result => {
+      const item = Array.isArray(result?.data) && typeof result?.mimeType !== 'string' ? result.data[0] : result;
+      if (!item || typeof item.mimeType !== 'string') {
+        return;
+      }
+      const {mimeType, data} = item;
       setSharedData(data);
       setSharedMimeType(mimeType);
     });
