@@ -154,3 +154,23 @@ Finally, in your `AppDelegate.m` add the following:
     }
 @end
 ```
+
+or in `AppDelegate.swift`:
+
+```Swift
+  ...
+  import RNShareMenu
+  ...
+
+  @main
+  class AppDelegate: RCTAppDelegate {
+    ...
+    override func application(
+        _ app: UIApplication,
+        open url: URL,
+        options: [UIApplication.OpenURLOptionsKey : Any] = [:]
+    ) -> Bool {
+        return ShareMenuManager.application(app, open: url, options: options)
+    }
+  }
+```

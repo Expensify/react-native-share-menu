@@ -6,13 +6,16 @@
 //
 //  Created by Gustavo Parreira on 26/07/2020.
 //
-//  Modified by Veselin Stoyanov on 17/04/2021.
+//  Modified by Damien White on 2025-03-04.
 
 import Foundation
 import MobileCoreServices
 import UIKit
 import Social
 import RNShareMenu
+import UniformTypeIdentifiers
+
+@available(iOSApplicationExtension, unavailable)
 
 class ShareViewController: SLComposeServiceViewController {
   var hostAppId: String?
@@ -47,7 +50,12 @@ class ShareViewController: SLComposeServiceViewController {
         return
       }
 
-      handlePost(items)
+      if (contentText != nil && contentText != "") {
+        let extraData: [String: Any] = ["userInput": contentText as String]
+        handlePost(items, extraData: extraData)
+      } else {
+        handlePost(items)
+      }
     }
 
     override func configurationItems() -> [Any]! {
@@ -129,7 +137,7 @@ class ShareViewController: SLComposeServiceViewController {
   }
   
   func storeText(withProvider provider: NSItemProvider, _ semaphore: DispatchSemaphore) {
-    provider.loadItem(forTypeIdentifier: kUTTypeText as String, options: nil) { (data, error) in
+    provider.loadItem(forTypeIdentifier: UTType.text.identifier, options: nil) { (data, error) in
       guard (error == nil) else {
         self.exit(withError: error.debugDescription)
         return
@@ -145,7 +153,7 @@ class ShareViewController: SLComposeServiceViewController {
   }
   
   func storeUrl(withProvider provider: NSItemProvider, _ semaphore: DispatchSemaphore) {
-    provider.loadItem(forTypeIdentifier: kUTTypeURL as String, options: nil) { (data, error) in
+    provider.loadItem(forTypeIdentifier: UTType.url.identifier as String, options: nil) { (data, error) in
       guard (error == nil) else {
         self.exit(withError: error.debugDescription)
         return
@@ -161,7 +169,7 @@ class ShareViewController: SLComposeServiceViewController {
   }
   
   func storeFile(withProvider provider: NSItemProvider, _ semaphore: DispatchSemaphore) {
-    provider.loadItem(forTypeIdentifier: kUTTypeData as String, options: nil) { (data, error) in
+    provider.loadItem(forTypeIdentifier: UTType.data.identifier, options: nil) { (data, error) in
       guard (error == nil) else {
         self.exit(withError: error.debugDescription)
         return
@@ -222,21 +230,19 @@ class ShareViewController: SLComposeServiceViewController {
       return
     }
     
-    let url = URL(string: urlScheme)
-    let selectorOpenURL = sel_registerName("openURL:")
-    var responder: UIResponder? = self
-    
-    while responder != nil {
-      if responder?.responds(to: selectorOpenURL) == true {
-        responder?.perform(selectorOpenURL, with: url)
-      }
-      responder = responder!.next
+    // fix for iOS 18 https://github.com/Expensify/react-native-share-menu/issues/318#issue-2543801893
+    guard let url = URL(string: urlScheme) else {
+      exit(withError: NO_INFO_PLIST_URL_SCHEME_ERROR)
+      return //be safe
     }
-    
-    completeRequest()
+    UIApplication.shared.open(url, options: [:], completionHandler: completeRequest)
   }
   
-  func completeRequest() {
+  func completeRequest(success: Bool) {
+    if !success {
+      cancelRequest()
+      return
+    }
     // Inform the host that we're done, so it un-blocks its UI. Note: Alternatively you could call super's -didSelectPost, which will similarly complete the extension context.
     extensionContext!.completeRequest(returningItems: [], completionHandler: nil)
   }
