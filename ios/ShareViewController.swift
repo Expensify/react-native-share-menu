@@ -15,23 +15,23 @@ import Social
 import RNShareMenu
 
 class ShareViewController: SLComposeServiceViewController {
-  var hostAppId: String?
   var hostAppUrlScheme: String?
+  var groupId: String?
   var sharedItems: [Any] = []
   
   override func viewDidLoad() {
     super.viewDidLoad()
     
-    if let hostAppId = Bundle.main.object(forInfoDictionaryKey: HOST_APP_IDENTIFIER_INFO_PLIST_KEY) as? String {
-      self.hostAppId = hostAppId
-    } else {
-      print("Error: \(NO_INFO_PLIST_INDENTIFIER_ERROR)")
-    }
-    
     if let hostAppUrlScheme = Bundle.main.object(forInfoDictionaryKey: HOST_URL_SCHEME_INFO_PLIST_KEY) as? String {
       self.hostAppUrlScheme = hostAppUrlScheme
     } else {
       print("Error: \(NO_INFO_PLIST_URL_SCHEME_ERROR)")
+    }
+
+    if let groupId = Bundle.main.object(forInfoDictionaryKey: GROUP_INFO_PLIST_KEY) as? String {
+      self.groupId = groupId
+    } else {
+        print("Error: \(NO_APP_GROUP_PLIST_ERROR)")
     }
   }
 
@@ -57,11 +57,11 @@ class ShareViewController: SLComposeServiceViewController {
 
   func handlePost(_ items: [NSExtensionItem], extraData: [String:Any]? = nil) {
     DispatchQueue.global().async {
-      guard let hostAppId = self.hostAppId else {
-        self.exit(withError: NO_INFO_PLIST_INDENTIFIER_ERROR)
+      guard let groupId = self.groupId else {
+        self.exit(withError: NO_APP_GROUP_PLIST_ERROR)
         return
       }
-      guard let userDefaults = UserDefaults(suiteName: "group.\(hostAppId)") else {
+      guard let userDefaults = UserDefaults(suiteName: groupId) else {
         self.exit(withError: NO_APP_GROUP_ERROR)
         return
       }
@@ -73,7 +73,6 @@ class ShareViewController: SLComposeServiceViewController {
       }
 
       let semaphore = DispatchSemaphore(value: 0)
-      var results: [Any] = []
 
       for item in items {
         guard let attachments = item.attachments else {
@@ -103,11 +102,11 @@ class ShareViewController: SLComposeServiceViewController {
   }
 
   func storeExtraData(_ data: [String:Any]) {
-    guard let hostAppId = self.hostAppId else {
-      print("Error: \(NO_INFO_PLIST_INDENTIFIER_ERROR)")
+    guard let groupId = self.groupId else {
+      print("Error: \(NO_APP_GROUP_PLIST_ERROR)")
       return
     }
-    guard let userDefaults = UserDefaults(suiteName: "group.\(hostAppId)") else {
+    guard let userDefaults = UserDefaults(suiteName: groupId) else {
       print("Error: \(NO_APP_GROUP_ERROR)")
       return
     }
@@ -116,11 +115,11 @@ class ShareViewController: SLComposeServiceViewController {
   }
 
   func removeExtraData() {
-    guard let hostAppId = self.hostAppId else {
-      print("Error: \(NO_INFO_PLIST_INDENTIFIER_ERROR)")
+    guard let groupId = self.groupId else {
+      print("Error: \(NO_APP_GROUP_PLIST_ERROR)")
       return
     }
-    guard let userDefaults = UserDefaults(suiteName: "group.\(hostAppId)") else {
+    guard let userDefaults = UserDefaults(suiteName: groupId) else {
       print("Error: \(NO_APP_GROUP_ERROR)")
       return
     }
@@ -166,16 +165,48 @@ class ShareViewController: SLComposeServiceViewController {
         self.exit(withError: error.debugDescription)
         return
       }
-      guard let url = data as? URL else {
-        self.exit(withError: COULD_NOT_FIND_IMG_ERROR)
-        return
+      
+      var url: URL! = nil
+      var image: UIImage! = nil
+      
+      if data is UIImage {
+        image = data as? UIImage
       }
-      guard let hostAppId = self.hostAppId else {
-        self.exit(withError: NO_INFO_PLIST_INDENTIFIER_ERROR)
+
+      if data is Data {
+        image = UIImage(data: data as! Data)!
+      }
+      
+      if (image != nil) {
+        let imageData: Data! = image.pngData()
+
+        // Creating temporary URL for image data (UIImage)
+        guard let imageURL = NSURL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent("TemporaryScreenshot.png") else {
+          self.exit(withError: COULD_NOT_GET_IMAGE_FILE_LOCATION)
+          return
+        }
+        
+        do {
+          // Writing the image to the URL
+          try imageData.write(to: imageURL)
+          url = imageURL
+        } catch {
+          self.exit(withError: COULD_NOT_WRITE_IMAGE_DATA)
+        }
+      } else {
+        guard let toUrl = data as? URL else {
+          self.exit(withError: COULD_NOT_TURN_DATA_TO_URL)
+          return
+        }
+        url = toUrl;
+      }
+      
+      guard let groupId = self.groupId else {
+        self.exit(withError: NO_APP_GROUP_PLIST_ERROR)
         return
       }
       guard let groupFileManagerContainer = FileManager.default
-              .containerURL(forSecurityApplicationGroupIdentifier: "group.\(hostAppId)")
+              .containerURL(forSecurityApplicationGroupIdentifier: groupId)
       else {
         self.exit(withError: NO_APP_GROUP_ERROR)
         return
@@ -193,6 +224,7 @@ class ShareViewController: SLComposeServiceViewController {
       }
       
       self.sharedItems.append([DATA_KEY: filePath.absoluteString, MIME_TYPE_KEY: mimeType])
+      
       semaphore.signal()
     }
   }

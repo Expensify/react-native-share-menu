@@ -3,7 +3,7 @@
 //  RNShareMenu
 //
 //  Created by Gustavo Parreira on 28/07/2020.
-//  Modified by Veselin Stoyanov on 17/04/2021.
+//  Modified by Veselin Stoyanov on 03/07/2021.
 
 import Foundation
 import MobileCoreServices
@@ -126,40 +126,16 @@ public class ShareMenuReactView: NSObject {
                         semaphore.wait()
                     } else if provider.hasItemConformingToTypeIdentifier(kUTTypeImage as String) {
                         provider.loadItem(forTypeIdentifier: kUTTypeImage as String, options: nil) { (item, error) in
-                            let imageUrl: URL! = item as? URL
+                            let url: URL! = self.getFileUrl(from: item as Any, withCallback: callback) as? URL
 
-                            if (imageUrl != nil) {
-                                if let imageData = try? Data(contentsOf: imageUrl) {
-                                    results.append([DATA_KEY: imageUrl.absoluteString, MIME_TYPE_KEY: self.extractMimeType(from: imageUrl)])
-                                }
-                            } else {
-                                let image: UIImage! = item as? UIImage
-
-                                if (image != nil) {
-                                    let imageData: Data! = image.pngData();
-
-                                    // Creating temporary URL for image data (UIImage)
-                                    guard let imageURL = NSURL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent("TemporaryScreenshot.png") else {
-                                        return
-                                    }
-
-                                    do {
-                                        // Writing the image to the URL
-                                        try imageData.write(to: imageURL)
-
-                                        results.append([DATA_KEY: imageUrl.absoluteString, MIME_TYPE_KEY: imageURL.extractMimeType()])
-                                    } catch {
-                                        callback(nil, NSException(name: NSExceptionName(rawValue: "Error"), reason:"Can't load image", userInfo:nil))
-                                    }
-                                }
-                            }
+                            results.append([DATA_KEY: url.absoluteString, MIME_TYPE_KEY: self.extractMimeType(from: url)])
 
                             semaphore.signal()
                         }
                         semaphore.wait()
                     } else if provider.hasItemConformingToTypeIdentifier(kUTTypeData as String) {
                         provider.loadItem(forTypeIdentifier: kUTTypeData as String, options: nil) { (item, error) in
-                            let url: URL! = item as? URL
+                            let url: URL! = self.getFileUrl(from: item as Any, withCallback: callback) as? URL
 
                             results.append([DATA_KEY: url.absoluteString, MIME_TYPE_KEY: self.extractMimeType(from: url)])
 
@@ -174,6 +150,46 @@ public class ShareMenuReactView: NSObject {
 
             callback(results, nil)
         }
+    }
+
+    func getFileUrl(from data: Any, withCallback callback: @escaping ([Any]?, NSException?) -> Void) -> Any {
+        var url: URL! = nil
+        var image: UIImage! = nil
+        
+        if data is UIImage {
+            image = data as? UIImage
+        }
+
+        if data is Data {
+            image = UIImage(data: data as! Data)!
+        }
+        
+        if (image != nil) {
+            let imageData: Data! = image.pngData()
+
+            // Creating temporary URL for image data (UIImage)
+            guard let imageURL = NSURL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent("TemporaryImage.png") else {
+                callback(nil, NSException(name: NSExceptionName(rawValue: "Error"), reason:"Can't save image in temp file", userInfo:nil))
+                return ""
+            }
+            
+            do {
+                // Writing the image to the URL
+                try imageData.write(to: imageURL)
+                url = imageURL
+            } catch {
+                callback(nil, NSException(name: NSExceptionName(rawValue: "Error"), reason:"Can't write image to URL", userInfo:nil))
+            }
+        } else {
+            guard let toUrl = data as? URL else {
+                callback(nil, NSException(name: NSExceptionName(rawValue: "Error"), reason:"Can't turn data into URL", userInfo:nil))
+                return ""
+            }
+
+            url = toUrl;
+        }
+
+        return url!
     }
 
     func extractMimeType(from url: URL) -> String {

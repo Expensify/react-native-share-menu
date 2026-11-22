@@ -13,8 +13,8 @@ public let DISMISS_SHARE_EXTENSION_WITH_ERROR_CODE = 1
 public let NO_URL_TYPES_ERROR_MESSAGE = "You have not defined CFBundleURLTypes in your Info.plist"
 public let NO_URL_SCHEMES_ERROR_MESSAGE = "You have not defined CFBundleURLSchemes in your Info.plist"
 public let NO_SCHEME_ERROR_MESSAGE = "You have not defined a scheme under CFBundleURLSchemes in your Info.plist"
+public let NO_APP_GROUP_PLIST_ERROR = "Failed to get App Group. Did you set up App Group ID in your Share Extension Info.plist?"
 public let NO_APP_GROUP_ERROR = "Failed to get App Group User Defaults. Did you set up an App Group on your App and Share Extension?"
-public let NO_INFO_PLIST_INDENTIFIER_ERROR = "You haven't defined \(HOST_APP_IDENTIFIER_INFO_PLIST_KEY) in your Share Extension's Info.plist"
 public let NO_INFO_PLIST_URL_SCHEME_ERROR = "You haven't defined \(HOST_URL_SCHEME_INFO_PLIST_KEY) in your Share Extension's Info.plist"
 public let COULD_NOT_FIND_STRING_ERROR = "Couldn't find string"
 public let COULD_NOT_FIND_URL_ERROR = "Couldn't find url"
@@ -24,14 +24,18 @@ public let COULD_NOT_SAVE_FILE_ERROR = "Couldn't save file on disk"
 public let NO_EXTENSION_CONTEXT_ERROR = "No extension context attached"
 public let NO_DELEGATE_ERROR = "No ReactShareViewDelegate attached"
 public let COULD_NOT_FIND_ITEMS_ERROR = "Couldn't find items attached to this share"
+public let COULD_NOT_GET_IMAGE_FILE_LOCATION = "Couldn't get image url file location to write to"
+public let COULD_NOT_WRITE_IMAGE_DATA = 
+"Couldn't write image data"
+public let COULD_NOT_TURN_DATA_TO_URL = "Couldn't turn data into url"
 
 // MARK: Keys
 
 public let USER_DEFAULTS_KEY = "ShareMenuUserDefaults"
 public let USER_DEFAULTS_EXTRA_DATA_KEY = "ShareMenuUserDefaultsExtraData"
 public let URL_SCHEME_INFO_PLIST_KEY = "AppURLScheme"
-public let HOST_APP_IDENTIFIER_INFO_PLIST_KEY = "HostAppBundleIdentifier"
 public let HOST_URL_SCHEME_INFO_PLIST_KEY = "HostAppURLScheme"
+public let GROUP_INFO_PLIST_KEY = "GroupID"
 
 public let REACT_SHARE_VIEW_BACKGROUND_COLOR_KEY = "ReactShareViewBackgroundColor"
 public let COLOR_RED_KEY = "Red"
