@@ -36,10 +36,10 @@ class ReactShareViewController: ShareViewController, RCTBridgeDelegate, ReactSha
         break backgroundColorSetup
       }
 
-      let red = backgroundColorConfig[COLOR_RED_KEY] as? Float ?? 1
-      let green = backgroundColorConfig[COLOR_GREEN_KEY] as? Float ?? 1
-      let blue = backgroundColorConfig[COLOR_BLUE_KEY] as? Float ?? 1
-      let alpha = backgroundColorConfig[COLOR_ALPHA_KEY] as? Float ?? 1
+      let red = (backgroundColorConfig[COLOR_RED_KEY] as? NSNumber)?.floatValue ?? 1
+      let green = (backgroundColorConfig[COLOR_GREEN_KEY] as? NSNumber)?.floatValue ?? 1
+      let blue = (backgroundColorConfig[COLOR_BLUE_KEY] as? NSNumber)?.floatValue ?? 1
+      let alpha = (backgroundColorConfig[COLOR_ALPHA_KEY] as? NSNumber)?.floatValue ?? 1
 
       rootView.backgroundColor = UIColor(red: CGFloat(red), green: CGFloat(green), blue: CGFloat(blue), alpha: CGFloat(alpha))
     }
