@@ -106,7 +106,16 @@ public class ShareMenuReactView: NSObject {
                 }
 
                 for provider in attachments {
-                    if provider.hasItemConformingToTypeIdentifier(kUTTypeURL as String) {
+                    if provider.hasItemConformingToTypeIdentifier(kUTTypeFileURL as String) {
+                        provider.loadItem(forTypeIdentifier: kUTTypeFileURL as String, options: nil) { (item, error) in
+                            let url: URL! = item as? URL
+
+                            results.append([DATA_KEY: url.absoluteString, MIME_TYPE_KEY: self.extractMimeType(from: url)])
+
+                            semaphore.signal()
+                        }
+                        semaphore.wait()
+                    } else if provider.hasItemConformingToTypeIdentifier(kUTTypeURL as String) {
                         provider.loadItem(forTypeIdentifier: kUTTypeURL as String, options: nil) { (item, error) in
                             let url: URL! = item as? URL
 
@@ -117,7 +126,7 @@ public class ShareMenuReactView: NSObject {
                         semaphore.wait()
                     } else if provider.hasItemConformingToTypeIdentifier(kUTTypeText as String) {
                         provider.loadItem(forTypeIdentifier: kUTTypeText as String, options: nil) { (item, error) in
-                            let text:String! = item as? String
+                            let text: String! = item as? String
 
                             results.append([DATA_KEY: text, MIME_TYPE_KEY: "text/plain"])
 
