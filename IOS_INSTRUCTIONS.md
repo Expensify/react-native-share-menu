@@ -97,7 +97,7 @@ Add the following to your app's `Info.plist` (if you already had other URL Schem
         <key>CFBundleURLSchemes</key>
         <array>
             <string>A_URL_SCHEME_UNIQUE_TO_YOUR_APP</string>
-            <!-- This url scheme doesn't contain :// at the end - E.G. "mycustomscheme"-->
+            <!-- This URL scheme doesn't contain :// at the end - e.g. "mycustomscheme" -->
         </array>
     </dict>
 </array>
@@ -110,7 +110,7 @@ Add the following to your Share Extension's `Info.plist`:
 <string>YOUR_APP_TARGET_BUNDLE_ID</string>
 <key>HostAppURLScheme</key>
 <string>YOUR_APP_URL_SCHEME_DEFINED_ABOVE</string>
-<!-- This url scheme CONTAINS :// at the end - E.G. "mycustomscheme://"-->
+<!-- A URL with a scheme as defined in CFBundleURLSchemes above. Can be just the scheme or a more specific URL e.g. "mycustomscheme://share" -->
 <key>NSExtension</key>
 <dict>
     <key>NSExtensionAttributes</key>
